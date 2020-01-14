@@ -182,7 +182,7 @@ function tc_populate_bars()
 // Call every second to look for new buttons and ones that are now active.
 function tc_populate_actions()
 {
-	if (tc_gettab() !== "main") return;
+	if (tc_gettab() !== "main-actions main-actions") return;
 
 	for (let qs of document.querySelectorAll(".main-actions .action-list .action-btn:not(.locked) .wrapped-btn:not([disabled])")) {
 		var key = qs.innerHTML.toLowerCase();
@@ -248,7 +248,7 @@ function tc_gettab()
 {
 	for (let tab of document.querySelectorAll("div.menu-items div.menu-item span")) {
 		var s = tab.innerHTML;
-		if (! /<u>/.test(s))
+		if (! /<\/u>/.test(s))
 			return s.slice(1, -1);	// strip off leading and trailing space
 	}
 }
