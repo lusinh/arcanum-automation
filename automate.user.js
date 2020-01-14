@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Harrygiel's fork
 // @version      1358
-// @author       aardvark, Linspatz
+// @author       aardvark, Linspatz, Harrygiel
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/mettalogic/arcanum-automation/raw/master/automate.user.js
 // @match        *//www.lerpinglemur.com/arcanum/*
