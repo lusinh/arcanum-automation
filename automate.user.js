@@ -385,7 +385,8 @@ function tc_automate()
 	tc_populate_resources();
 
 	if (tc_check_resource("herbs",1) && !tc_check_resource("gold",1))
-		for (let i=0; i < 20; ++i)
+		var sellamount = tc_resources[1] / 2;
+		for (let i=0; i < sellamount; ++i)
 			tc_click_action("sell herbs");
 
 	if (tc_check_resource("research",1) && !tc_check_resource("scrolls",1) && tc_check_bars("mana",.75))
