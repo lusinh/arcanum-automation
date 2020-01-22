@@ -4,7 +4,8 @@
 // @author       aardvark, Linspatz, Harrygiel
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/harrygiel/arcanum-automation/raw/master/automate.user.js
-// @match        *www.lerpinglemur.com/arcanum/*
+// @match        http://www.lerpinglemur.com/arcanum/*
+// @match        https://www.lerpinglemur.com/arcanum/*
 // @match        http://game312933.konggames.com/gamez/0031/2933/*
 // @match        https://game312933.konggames.com/gamez/0031/2933/*
 // @run-at       document-idle
@@ -182,7 +183,7 @@ function tc_populate_bars()
 // Call every second to look for new buttons and ones that are now active.
 function tc_populate_actions()
 {
-	if (tc_gettab() !== "main-actions main-actions") return;
+	if (tc_gettab() !== "main") return;
 
 	for (let qs of document.querySelectorAll(".main-actions .action-list .action-btn:not(.locked) .wrapped-btn:not([disabled])")) {
 		var key = qs.innerHTML.toLowerCase();
@@ -385,7 +386,7 @@ function tc_automate()
 	tc_populate_resources();
 
 	if (tc_check_resource("herbs",1) && !tc_check_resource("gold",1))
-		var sellamount = tc_resources[1] / 2;
+		var sellamount = tc_resources.get("herbs")[1] / 2;
 		for (let i=0; i < sellamount; ++i)
 			tc_click_action("sell herbs");
 
@@ -426,7 +427,7 @@ function tc_automate()
 		if (tc_click_action("sublimate lore"))
 			for (let qs of document.querySelectorAll(".popup"))
 				// will get some errors in console here as popup matches config screen
-				if (qs.children[0].children[0].innerHTML == "sublimate lore")
+				if (qs.children[0].children[0] && qs.children[0].children[0].innerHTML == "sublimate lore")
                     qs.children[1].children[0].click();
 	}
 
