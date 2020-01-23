@@ -107,6 +107,9 @@ var tc_autospells = {
 	"pulsing light" : 45,
 	"pulsing light II" : 60,
 	"pulsing light III" : 120,
+	"copper skin" : 30,
+	"stone skin" : 50,
+	"iron skin" : 60,
 };
 
 // One-off actions that earn gold ordered from best to worst (gold/stamina), and stamina cost/click.
