@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Harrygiel's fork
-// @version      1652
+// @version      1698
 // @author       aardvark, Linspatz, Harrygiel
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/harrygiel/arcanum-automation/raw/master/automate.user.js
@@ -8,6 +8,8 @@
 // @match        https://www.lerpinglemur.com/arcanum/*
 // @match        http://game312933.konggames.com/gamez/0031/2933/*
 // @match        https://game312933.konggames.com/gamez/0031/2933/*
+// @match        http://www.kongregate.com/games/lerpinglemur/theory-of-magic
+// @match        https://www.kongregate.com/games/lerpinglemur/theory-of-magic*
 // @run-at       document-idle
 // ==/UserScript==
 
@@ -89,6 +91,7 @@ var tc_autospells = {
 	"mana" : 120,
 	"minor fount" : 30,
 	"fount" : 60,
+	"greater fount" : 90,
 	"wild growth" : 45,
 	"abundance" : 60,
 	"unearth" : 120,
