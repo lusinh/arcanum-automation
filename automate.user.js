@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Harrygiel's fork
-// @version      1698
+// @version      1716
 // @author       aardvark, Linspatz, Harrygiel
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/harrygiel/arcanum-automation/raw/master/automate.user.js
@@ -191,14 +191,14 @@ function tc_populate_actions()
 {
 	if (tc_gettab() !== "main") return;
 
-	for (let qs of document.querySelectorAll(".main-actions .action-list .action-btn:not(.locked) .wrapped-btn:not([disabled])")) {
+	for (let qs of document.querySelectorAll(".main-tasks .task-list .task-btn:not(.locked) .wrapped-btn:not([disabled])")) {
 		var key = qs.innerHTML.toLowerCase();
 		if (!tc_actions.get(key)) {
 			tc_actions.set(key, qs);
 			if (tc_debug) console.log("Action stored: " + qs.innerHTML);
 		}
 	}
-	for (let qs of document.querySelectorAll(".main-actions .upgrade-list .action-btn:not(.locked) .wrapped-btn:not([disabled])")) {
+	for (let qs of document.querySelectorAll(".main-tasks .task-list .task-btn:not(.locked) .wrapped-btn:not([disabled])")) {
 		var key = qs.innerHTML.toLowerCase();
 		if (!tc_actions.get(key)) {
 			tc_actions.set(key, qs);
