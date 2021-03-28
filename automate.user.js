@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Sing's fork
-// @version      2000
+// @version      2001
 // @author       aardvark, Linspatz, Harrygiel, Sing
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/lusinh/arcanum-automation/raw/master/automate.user.js
@@ -13,8 +13,6 @@
 // @match        https://www.kongregate.com/games/lerpinglemur/theory-of-magic*
 // @run-at       document-idle
 // ==/UserScript==
-
-var tc_arcanum_ver = 10000;		// used to allow backwards compatibility
 
 var tc_debug = false;	// set to true to see debug messages
 function log(message) {
@@ -38,7 +36,7 @@ var tc_auto_focus_aggressive = false;
 
 // Set to a adventure name to continously run that adventure, leave blank to disable
 var tc_auto_adventure = "";
-var tc_adventure_wait = 30;//How many ticks to wait to rerun an adventure
+var tc_adventure_wait = 3;//How many ticks to wait to rerun an adventure
 var tc_adventure_wait_cd = 30;//Counts down
 /* The following can be increased by encounters in the adventure listed.
 (Stat) - ("dungeon name") (increased amount) (chance to get the encounter needed)
