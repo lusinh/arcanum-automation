@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Sing's fork
-// @version      2001
+// @version      2002
 // @author       aardvark, Linspatz, Harrygiel, Sing
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work.
 // @downloadURL  https://github.com/lusinh/arcanum-automation/raw/master/automate.user.js
@@ -1075,8 +1075,17 @@ function tc_inv_setup() {
 
 
 // Functions to load and save settings from local storage and display configuration dialog.
-
+var bool_setting_list = ['tc_suspend','tc_auto_cast','tc_skipcast','tc_auto_focus','tc_auto_heal','tc_auto_misc','tc_use_sublimate','tc_auto_gather','tc_auto_grind','tc_auto_earn_gold','tc_auto_adv','tc_adventure_wait','tc_adventure_wait_cd','tc_auto_focus_aggressive','tc_debug'];
+var int_setting_list = ['tc_auto_speed_spells','tc_auto_speed','tc_adventure_wait'];
 function tc_load_settings() {
+	for (let n of bool_setting_list) {
+		eval(n) = (localStorage.getItem(n) === "true");
+		document.getElementById(n).checked = eval(n);
+	}
+	for (let n of int_setting_list) {
+		eval(n) = parseInt(localStorage.getItem(n));
+		document.getElementById(n).value = eval(n);
+	}
 	// All data stored in localStorage is of type string - need to convert it back.
 	// Also allow default values for first time running script.
 	function get_val(name, default_val, type) {
@@ -1088,40 +1097,40 @@ function tc_load_settings() {
 	}
 
 	// Set default values here to be "noob-friendly"
-	tc_suspend = get_val("tc_suspend", false, "bool");
-	tc_auto_cast = get_val("tc_auto_cast", true, "bool");
-	tc_skipcast = get_val("tc_skipcast", true, "bool");
-	tc_auto_focus = get_val("tc_auto_focus", true, "bool");
-	tc_auto_heal = get_val("tc_auto_heal", true, "bool");
-	tc_auto_misc = get_val("tc_auto_misc", true, "bool");
-	tc_use_sublimate = get_val("tc_use_sublimate", true, "bool");
-	tc_auto_gather = get_val("tc_auto_gather", true, "bool");
-	tc_auto_grind = get_val("tc_auto_grind", true, "bool");
-	tc_auto_speed = get_val("tc_auto_speed", 1000, "int");
-	tc_auto_speed_spells = get_val("tc_auto_speed_spells", 950, "int");
-	tc_auto_earn_gold = get_val("tc_auto_earn_gold", false, "bool");
-	tc_auto_adv = get_val("tc_auto_adv", true, "bool");
-	tc_adventure_wait = get_val("tc_adventure_wait", 30, "int");	// needs to be below tc_auto_speed
-	tc_adventure_wait_cd = tc_adventure_wait;	//sets current cooldown to same time as wait period.
-	tc_auto_focus_aggressive = get_val("tc_auto_focus_aggressive", false, "bool");
-	tc_debug = get_val("tc_debug", false, "bool");
+	// tc_suspend = get_val("tc_suspend", false, "bool");
+	// tc_auto_cast = get_val("tc_auto_cast", true, "bool");
+	// tc_skipcast = get_val("tc_skipcast", true, "bool");
+	// tc_auto_focus = get_val("tc_auto_focus", true, "bool");
+	// tc_auto_heal = get_val("tc_auto_heal", true, "bool");
+	// tc_auto_misc = get_val("tc_auto_misc", true, "bool");
+	// tc_use_sublimate = get_val("tc_use_sublimate", true, "bool");
+	// tc_auto_gather = get_val("tc_auto_gather", true, "bool");
+	// tc_auto_grind = get_val("tc_auto_grind", true, "bool");
+	// tc_auto_speed = get_val("tc_auto_speed", 1000, "int");
+	// tc_auto_speed_spells = get_val("tc_auto_speed_spells", 950, "int");
+	// tc_auto_earn_gold = get_val("tc_auto_earn_gold", false, "bool");
+	// tc_auto_adv = get_val("tc_auto_adv", true, "bool");
+	// tc_adventure_wait = get_val("tc_adventure_wait", 30, "int");	// needs to be below tc_auto_speed
+	// tc_auto_focus_aggressive = get_val("tc_auto_focus_aggressive", false, "bool");
+	// tc_debug = get_val("tc_debug", false, "bool");
 
-	document.getElementById("tc_suspend").checked = !tc_suspend;	// this one's backwards
-	document.getElementById("tc_auto_cast").checked = tc_auto_cast;
-	document.getElementById("tc_skipcast").checked = tc_skipcast;
-	document.getElementById("tc_auto_focus").checked = tc_auto_focus;
-	document.getElementById("tc_auto_heal").checked = tc_auto_heal;
-	document.getElementById("tc_auto_misc").checked = tc_auto_misc;
-	document.getElementById("tc_use_sublimate").checked = tc_use_sublimate;
-	document.getElementById("tc_auto_gather").checked = tc_auto_gather;
-	document.getElementById("tc_auto_grind").checked = tc_auto_grind;
-	document.getElementById("tc_auto_speed").value = tc_auto_speed;
-	document.getElementById("tc_auto_speed_spells").value = tc_auto_speed_spells;
-	document.getElementById("tc_auto_earn_gold").checked = tc_auto_earn_gold;
-	document.getElementById("tc_auto_adv").checked = tc_auto_adv;
-	document.getElementById("tc_adventure_wait").value = (tc_adventure_wait / 1000 * tc_auto_speed);
-	document.getElementById("tc_auto_focus_aggressive").checked = tc_auto_focus_aggressive;
-	document.getElementById("tc_debug").checked = tc_debug;
+	// document.getElementById("tc_suspend").checked = !tc_suspend;	// this one's backwards
+	// document.getElementById("tc_auto_cast").checked = tc_auto_cast;
+	// document.getElementById("tc_skipcast").checked = tc_skipcast;
+	// document.getElementById("tc_auto_focus").checked = tc_auto_focus;
+	// document.getElementById("tc_auto_heal").checked = tc_auto_heal;
+	// document.getElementById("tc_auto_misc").checked = tc_auto_misc;
+	// document.getElementById("tc_use_sublimate").checked = tc_use_sublimate;
+	// document.getElementById("tc_auto_gather").checked = tc_auto_gather;
+	// document.getElementById("tc_auto_grind").checked = tc_auto_grind;
+	// document.getElementById("tc_auto_speed").value = tc_auto_speed;
+	// document.getElementById("tc_auto_speed_spells").value = tc_auto_speed_spells;
+	// document.getElementById("tc_auto_earn_gold").checked = tc_auto_earn_gold;
+	// document.getElementById("tc_auto_adv").checked = tc_auto_adv;
+	// document.getElementById("tc_adventure_wait").value = (tc_adventure_wait / 1000 * tc_auto_speed);
+	// document.getElementById("tc_auto_focus_aggressive").checked = tc_auto_focus_aggressive;
+	// document.getElementById("tc_debug").checked = tc_debug;
+	tc_adventure_wait_cd = tc_adventure_wait;	//sets current cooldown to same time as wait period.
 }
 
 function tc_save_settings() {
@@ -1194,6 +1203,15 @@ function tc_show_config() {
 	log("config clicked");
 }
 
+function open_god_panel() {
+	var config = document.getElementById("sinh_controll_panel");
+	if (!config) return;
+
+	config.style.backgroundColor = document.querySelector("body").classList.contains("darkmode") ? "#333" : "#eee";
+
+	config.style.display = "block";
+}
+
 function tc_config_help() {
 	var help = document.getElementById("config_help");
 	if (!help) return;
@@ -1215,13 +1233,17 @@ function tc_help_close() {
 	log("config help closed");
 }
 
+function sinh_close_panel() {
+	var panel = document.getElementById("sinh_controll_panel");
+	panel.style.display = 'none';
+}
+
 function sinh_function() {
 	console.log("Sing's function called.");
-	for (var i=0;i<resoure_list.length;i++) {
-		unsafeWindow.game.gdata[resoure_list[i]].add(1000);
+	var res_list = document.querySelectorAll(".res-list .rsrc");
+	for (let n of res_list) {
+		unsafeWindow.game.gdata[n.dataset.key].add(100000);
 	}
-	unsafeWindow.game.gdata['gold'].add(10000);
-	unsafeWindow.game.gdata['research'].add(10000);
 	console.log("End Sing's function called.");
 }
 
@@ -1232,26 +1254,75 @@ function un_stress() {
 	}
 	for (let n of dungeon_list) {
 		if (unsafeWindow.game.gdata[n] != undefined)
-			unsafeWindow.game.gdata[n].length.value = 10;
+			unsafeWindow.game.gdata[n].length.value = 5;
 	}
 	for (let n of task_with_length) {
 		unsafeWindow.game.gdata[n].length.value = 1;
 	}
-	for (let n of ['mana','fire','air','earth','water','nature','shadow','light','spirit','tempus','chaos','void']) {
+	for (let n of ['stamina','mana','fire','air','earth','water','nature','shadow','light','spirit','tempus','chaos','void']) {
+		unsafeWindow.game.gdata[n].doUnlock();
 		unsafeWindow.game.gdata[n].rate.value = 100;
 	}
 	unsafeWindow.game.gdata['focus'].result.runner.exp = 100000000;
 }
 
+function unlock_tasks_and_upgrades(){
+	var task_list = document.querySelectorAll(".main-tasks .task-list .task-btn");
+	var upgrade_list = document.querySelectorAll(".main-tasks .upgrade-list .task-btn");
+	for (let n of task_list) unsafeWindow.game.gdata[n.dataset.key].doUnlock();
+	for (let n of upgrade_list) {
+		unsafeWindow.game.gdata[n.dataset.key].doUnlock();
+		if (!n.disabled) n.click();
+	}
+}
+
+function readableText(variable_name) {
+	var result = variable_name.split('_').join(' ');
+	if (result.length > 0) result[0] = result[0].toUpperCase();
+	return result;
+}
+
+function max_space(){
+	unsafeWindow.game.gdata['space'].max.value = 1000000;
+}
+
+function renderPanel(){
+	if (document.getElementById("open_god_panel")) return;
+	var config = document.querySelectorAll(".quickbar");if (config.length == 0) return;
+	config = config[0];
+
+	var function_list = ['sinh_function', 'un_stress', 'max_space', 'unlock_tasks_and_upgrades'];
+	var button_list = function_list.map( a => `<button type="button" id="${a}" class="task-btn">${readableText(a)}</button>`);
+	var html = `
+<div id="sinh_controll_panel" class="settings popup task-btn" style="display:none; background-color:#777; max-width:800px; position: absolute; bottom:15px; right: 15px; top: auto; left: auto;">
+${button_list.join('')}
+<hr>
+<button type="button" id="sinh_close_panel" style="float:left" class="btn-sm">Close</button>
+</div>
+`;
+
+	var dummy = document.createElement('div');
+	dummy.innerHTML = html;
+	document.body.firstElementChild.appendChild(dummy);
+
+	var configbtn = document.createElement("button");
+	var t1 = document.createTextNode("God panel");
+	configbtn.appendChild(t1);
+	configbtn.id = "open_god_panel";
+	configbtn.style = "margin-left: auto";	// align right in flexbox
+	configbtn.class = "btn-sm";
+	configbtn.addEventListener("click", open_god_panel);
+
+	config.parentNode.insertBefore(configbtn, null);
+	function_list.push('sinh_close_panel');
+	for (let n of function_list) document.getElementById(n).addEventListener("click", eval(n));
+}
+
 function tc_config_setup() {
 	if (document.getElementById("automate_config")) return;
 
-	// Try to add the config button to the quickslot bar, but if the user hasn't created any shortcuts yet fall back to quickbar
-	var config = document.querySelectorAll(".quickslot");
-	if (config.length == 0) {
-		config = document.querySelectorAll(".quickbar");
-		if (config.length == 0) return;	// nothing to add it to
-	}
+	var config = document.querySelectorAll(".quickbar");
+	if (config.length == 0) return;	// nothing to add it to
 	config = config[0];
 
 	var configbtn = document.createElement("button");
@@ -1270,7 +1341,7 @@ function tc_config_setup() {
 	var html = `
 <!-- Configuration Option -->
 <div id="config_options" class="settings popup" style="display:none; background-color:#777; max-width:800px; position: absolute; bottom:15px; right: 15px; top: auto; left: auto;">
-<input type="checkbox" name="tc_suspend" id="tc_suspend" title="If unchecked, all automation is suspended. If checked, items enabled below will be run."> enable automation of items below<br><br>
+<input type="checkbox" name="tc_suspend" id="tc_suspend" title="If checked, all automation is suspended. If unchecked, items enabled below will be run."> suspend automation of items below<br><br>
 <input type="checkbox" name="tc_auto_misc" id="tc_auto_misc"> buy gems, sell herbs, scribe scrolls etc.<br>
 <input type="checkbox" name="tc_use_sublimate" id="tc_use_sublimate"> activate sublimate lore when codices are full<br>
 <input type="checkbox" name="tc_auto_gather" id="tc_auto_gather"> gather herbs when stamina is full and herbs aren't (recommend minimum 2000ms auto interval)<br>
@@ -1281,7 +1352,7 @@ function tc_config_setup() {
 <input type="checkbox" name="tc_skipcast" id="tc_skipcast"> but don't cast buffs when not needed (eg. no wild growth when herbs are full)<br>
 <input type="checkbox" name="tc_auto_heal" id="tc_auto_heal"> cast healing spells in combat<br><br>
 <input type="checkbox" name="tc_auto_adv" id="tc_auto_adv"> automatically reenter dungeons <br>
-<input type="text" name="tc_adventure_wait" id="tc_adventure_wait" width=10> number of seconds to wait before reentering an adventure<br>
+<input type="text" name="tc_adventure_wait" id="tc_adventure_wait" width=10> number of miliseconds to wait before reentering an adventure<br>
 <hr>
 <input type="text" name="tc_auto_speed" id="tc_auto_speed" width=10> interval (ms) to run automation functions<br>
 <input type="text" name="tc_auto_speed_spells" id="tc_auto_speed_spells" width=10 title="Should be 1000 but reduce it if lag is causing spell buffs to expire"> interval (ms) for spellcast functions<br>
@@ -1319,20 +1390,20 @@ The advanced feature "try to learn faster in skills tab" will alternate between 
 
 	config.parentNode.insertBefore(configbtn, null);
 
-	var sinhbtn = document.createElement("button");
-	var t2 = document.createTextNode("Sinh's function");
-	sinhbtn.appendChild(t2);
-	sinhbtn.id = "sinh_function";
-	sinhbtn.style = "margin-left: auto";	// align right in flexbox
-	sinhbtn.addEventListener("click", sinh_function);
-	config.parentNode.insertBefore(sinhbtn, null);
+	// var sinhbtn = document.createElement("button");
+	// var t2 = document.createTextNode("Sinh's function");
+	// sinhbtn.appendChild(t2);
+	// sinhbtn.id = "sinh_function";
+	// sinhbtn.style = "margin-left: auto";	// align right in flexbox
+	// sinhbtn.addEventListener("click", sinh_function);
+	// config.parentNode.insertBefore(sinhbtn, null);
 
-	var sinhbtn2 = document.createElement("button");
-	var t3 = document.createTextNode("unstress");
-	sinhbtn2.appendChild(t3);
-	sinhbtn2.style = "margin-left: auto";	// align right in flexbox
-	sinhbtn2.addEventListener("click", un_stress);
-	config.parentNode.insertBefore(sinhbtn2, null);
+	// var sinhbtn2 = document.createElement("button");
+	// var t3 = document.createTextNode("unstress");
+	// sinhbtn2.appendChild(t3);
+	// sinhbtn2.style = "margin-left: auto";	// align right in flexbox
+	// sinhbtn2.addEventListener("click", un_stress);
+	// config.parentNode.insertBefore(sinhbtn2, null);
 
 	// Now need to add the onClick handlers for the cancel/save buttons.
 	// Can't do this directly in the HTML above because the GreaseMonkey functions exist in a different namespace
@@ -1371,6 +1442,7 @@ function tc_start_timers()	// can be restarted by save_settings()
 
 	tc_timer_ac = window.setInterval(function () {
 		tc_config_setup();
+		renderPanel();
 		tc_populate_spells();
 		tc_populate_resources();
 		tc_populate_actions();
