@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Sing's fork
-// @version      2003
+// @version      2004
 // @author       aardvark, Linspatz, Harrygiel, Sing
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work. Add some hack feature ^^
 // @downloadURL  https://github.com/lusinh/arcanum-automation/raw/master/automate.user.js
@@ -78,6 +78,7 @@ var locale_list = ['loc_ageshall','mustylibrary','loc_spring','eryleyot','loc_tr
 var encounter_list = ['enc_primer1','enc_workbook1','enc_bookworm','mysticwater','manatree','enc_heather','enc_tapestry','foggydale','enc_chest1','enc_chest2','enc_chest3','enc_chest4','enc_primer2','enc_thyffr','enc_delki','enc_gnome','enc_gibber','enc_mummy','eeriemoans','strangebones','enc_embalm1','sarcophagus','enc_rats','hauntedglade','hiddencache','murkywater','enc_blackcat','enc_hest_ward','enc_cauldron','enc_hettie','enc_hestia','enc_pidwig','pidwigtreasure','starrysky1','pidwigstars','sombersunset','brightvista','enc_tome','enc_history','enc_workbook2','enc_furnace','enc_alchemy','enc_statue2','enc_statue4','enc_battle1','enc_mtpass','enc_oldstone','enc_sindel','enc_tenwick','enc_wyrd','enc_gap','enc_mirror1','enc_mirror2','enc_futuremirror','enc_rageemirror','enc_mirrorhall','enc_voidmirror','enc_watermirror','enc_pastmirror','enc_farmirror','enc_sandstorm','enc_oasis','enc_mirage','enc_orremtrade','enc_madwinds','orrem_rains','enc_orrem_cave','enc_caravan','enc_aeonclock','e_bloodgrass','e_spidermass','e_snakemass','e_agolith','e_cockatrice','e_trumple','e_balmuth','e_moss_portal','e_big_scale','e_gryffon','e_wyvern','e_hydra','e_barghest','e_phoenix','e_pogler','e_flithy','e_bestiary1','e_bestiary2']
 var task_with_length =['errands','prestidigitation','heist','spellbook','act_scry','act_concoct','act_mine','dreamweaver','spingold','bloodsiphon','graverob','murder','vileexperiment','dissect','grindbones','embalm','paidseance','trapsoul','indulge','chant','eatchildren','sabbat','a_oppress','geas','weavetapestry','craftrune','craftschematic','demonbag','mapstars','bestiary','bestiary2','compiletome','codexannih','markhulcodex','sylvansyllabary','dwarfbook','lemurlexicon','demondict','arazorannals','orremannals','malleus','terraform','remakehammer','maketitanhammer','fazbitfixate','coporisfabrica','unendingscroll','unendingcodex','unendingtome','almagest','craftgem','craftfirerune','craftearthrune','craftairrune','craftwaterrune','craftspiritrune','phylactory','up_lich','animalfriend','summonfamiliar']
 var dungeon_list = ['sunnyfield','placidgrove','pestcontrol','stonyhills','ettinmarchcamp','fetidbarrow','treffilwoods','underden','veldranswreck','aragheights','hauntedmanor','sereditetemple','goblincamp','orccamp','aragogres','spidercave','aragwastes','mtgorborung','greatbog','catacrypts','elementrift','veldransstorehouse','desillagrotto','charredkeep','belowgorborung','temple of strativax','holyhall']
+var function_list = ['un_stress', 'max_space', 'unlock_tasks_and_upgrades'];
 
 // List of Gems that needs to be updated manually if changed.
 var tc_gems = {
@@ -370,7 +371,7 @@ function tc_autocast() {
 	if (!tc_auto_cast) return;
 
 	for (var spell in tc_autospells) {
-		var rpt = tc_autospells[spell];
+		var rpt = Math.floor(tc_autospells[spell]*1000/tc_auto_speed_spells);
 		if (tc_time_offset % rpt == 0 && !(tc_skipcast && tc_skip_cast(spell))) {
 			log("try casting " + spell);
 			tc_cast_spell(spell);
@@ -475,7 +476,7 @@ function tc_selljunk() {
 
 	function checkmatch(m) { for (let i of sell_match) if (RegExp(i).test(m)) return true; return false; }
 
-	var itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv .item-table tr")
+	var itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv .item-table .item")
 	if (itemlocation.length == 0)
 		itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv table tr")
 
@@ -485,7 +486,7 @@ function tc_selljunk() {
 			var item = row.children[0].innerText;
 			if (sell_exact.indexOf(item) != -1 || checkmatch(item)) {
 				log("Selling: " + item);
-				row.children[3].children[0].click();
+				row.children[3].click();
 			}
 		}
 	}
@@ -496,13 +497,13 @@ function tc_selldups() {
 	var items = new Map(); // test
 
 	// Build a map of item -> qty
-	var itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv .item-table tr")
+	var itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv .item-table .item");
 	if (itemlocation.length == 0)
-		itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv table tr")
+		itemlocation = document.querySelectorAll(".adventure .raid-bottom .inv table tr");
 
 	for (let row of itemlocation) {
 		// table has 4 columns: name + 3 buttons: Equip, Take, Sell
-		if (row.children[3].children[0].innerText == "Sell") {
+		if (row.children[3].innerText == "Sell") {
 			var item = row.children[0].innerText;
 			var qty = items.get(item);
 			items.set(item, qty ? qty + 1 : 1);
@@ -512,7 +513,7 @@ function tc_selldups() {
 	// Now iterate over rows, selling items where qty > 1
 	for (let row of itemlocation) {
 		// table has 4 columns: name + 3 buttons: Equip, Take, Sell
-		if (row.children[3].children[0].innerText == "Sell") {
+		if (row.children[3].innerText == "Sell") {
 			var item = row.children[0].innerText;
 			var qty = items.get(item);
 			var maxqty = 1;
@@ -534,7 +535,7 @@ function tc_selldups() {
 		}
 		if (qty > maxqty) {
 			log("Selling: " + item);
-			row.children[3].children[0].click();
+			row.children[3].click();
 			items.set(item, qty - 1);
 		}
 	}
@@ -1076,15 +1077,17 @@ function tc_inv_setup() {
 
 
 // Functions to load and save settings from local storage and display configuration dialog.
-var bool_setting_list = ['tc_suspend','tc_auto_cast','tc_skipcast','tc_auto_focus','tc_auto_heal','tc_auto_misc','tc_use_sublimate','tc_auto_gather','tc_auto_grind','tc_auto_earn_gold','tc_auto_adv','tc_adventure_wait','tc_adventure_wait_cd','tc_auto_focus_aggressive','tc_debug'];
+var bool_setting_list = ['tc_suspend','tc_auto_cast','tc_skipcast','tc_auto_focus','tc_auto_heal','tc_auto_misc','tc_use_sublimate','tc_auto_gather','tc_auto_grind','tc_auto_earn_gold','tc_auto_adv','tc_adventure_wait','tc_auto_focus_aggressive','tc_debug'];
 var int_setting_list = ['tc_auto_speed_spells','tc_auto_speed','tc_adventure_wait'];
 function tc_load_settings() {
 	for (let n of bool_setting_list) {
-		eval(n) = (localStorage.getItem(n) === "true");
+		eval(n + "=" + (localStorage.getItem(n) === "true"));
 		document.getElementById(n).checked = eval(n);
+		console.log(`print ${eval(n)}`);
+		console.log(`print ${document.getElementById(n).checked}`);
 	}
 	for (let n of int_setting_list) {
-		eval(n) = parseInt(localStorage.getItem(n));
+		eval(n + "=" + parseInt(localStorage.getItem(n)));
 		document.getElementById(n).value = eval(n);
 	}
 	// All data stored in localStorage is of type string - need to convert it back.
@@ -1097,78 +1100,19 @@ function tc_load_settings() {
 		return val;
 	}
 
-	// Set default values here to be "noob-friendly"
-	// tc_suspend = get_val("tc_suspend", false, "bool");
-	// tc_auto_cast = get_val("tc_auto_cast", true, "bool");
-	// tc_skipcast = get_val("tc_skipcast", true, "bool");
-	// tc_auto_focus = get_val("tc_auto_focus", true, "bool");
-	// tc_auto_heal = get_val("tc_auto_heal", true, "bool");
-	// tc_auto_misc = get_val("tc_auto_misc", true, "bool");
-	// tc_use_sublimate = get_val("tc_use_sublimate", true, "bool");
-	// tc_auto_gather = get_val("tc_auto_gather", true, "bool");
-	// tc_auto_grind = get_val("tc_auto_grind", true, "bool");
-	// tc_auto_speed = get_val("tc_auto_speed", 1000, "int");
-	// tc_auto_speed_spells = get_val("tc_auto_speed_spells", 950, "int");
-	// tc_auto_earn_gold = get_val("tc_auto_earn_gold", false, "bool");
-	// tc_auto_adv = get_val("tc_auto_adv", true, "bool");
-	// tc_adventure_wait = get_val("tc_adventure_wait", 30, "int");	// needs to be below tc_auto_speed
-	// tc_auto_focus_aggressive = get_val("tc_auto_focus_aggressive", false, "bool");
-	// tc_debug = get_val("tc_debug", false, "bool");
-
-	// document.getElementById("tc_suspend").checked = !tc_suspend;	// this one's backwards
-	// document.getElementById("tc_auto_cast").checked = tc_auto_cast;
-	// document.getElementById("tc_skipcast").checked = tc_skipcast;
-	// document.getElementById("tc_auto_focus").checked = tc_auto_focus;
-	// document.getElementById("tc_auto_heal").checked = tc_auto_heal;
-	// document.getElementById("tc_auto_misc").checked = tc_auto_misc;
-	// document.getElementById("tc_use_sublimate").checked = tc_use_sublimate;
-	// document.getElementById("tc_auto_gather").checked = tc_auto_gather;
-	// document.getElementById("tc_auto_grind").checked = tc_auto_grind;
-	// document.getElementById("tc_auto_speed").value = tc_auto_speed;
-	// document.getElementById("tc_auto_speed_spells").value = tc_auto_speed_spells;
-	// document.getElementById("tc_auto_earn_gold").checked = tc_auto_earn_gold;
-	// document.getElementById("tc_auto_adv").checked = tc_auto_adv;
-	// document.getElementById("tc_adventure_wait").value = (tc_adventure_wait / 1000 * tc_auto_speed);
-	// document.getElementById("tc_auto_focus_aggressive").checked = tc_auto_focus_aggressive;
-	// document.getElementById("tc_debug").checked = tc_debug;
 	tc_adventure_wait_cd = tc_adventure_wait;	//sets current cooldown to same time as wait period.
 }
 
 function tc_save_settings() {
-	tc_suspend = !document.getElementById("tc_suspend").checked;	// this one's backwards
-	tc_auto_cast = document.getElementById("tc_auto_cast").checked;
-	tc_skipcast = document.getElementById("tc_skipcast").checked;
-	tc_auto_focus = document.getElementById("tc_auto_focus").checked;
-	tc_auto_heal = document.getElementById("tc_auto_heal").checked;
-	tc_auto_misc = document.getElementById("tc_auto_misc").checked;
-	tc_use_sublimate = document.getElementById("tc_use_sublimate").checked;
-	tc_auto_gather = document.getElementById("tc_auto_gather").checked;
-	tc_auto_grind = document.getElementById("tc_auto_grind").checked;
-	tc_auto_speed = parseInt(document.getElementById("tc_auto_speed").value);
-	tc_auto_speed_spells = parseInt(document.getElementById("tc_auto_speed_spells").value);
-	tc_auto_earn_gold = document.getElementById("tc_auto_earn_gold").checked;
-	tc_auto_adv = document.getElementById("tc_auto_adv").checked;
-	tc_adventure_wait = (parseInt(document.getElementById("tc_adventure_wait").value) * 1000 / tc_auto_speed);
-	tc_adventure_wait_cd = tc_adventure_wait; 	//sets current cooldown to same time as wait period.
-	tc_auto_focus_aggressive = document.getElementById("tc_auto_focus_aggressive").checked;
-	tc_debug = document.getElementById("tc_debug").checked;
-
-	localStorage.setItem("tc_suspend", tc_suspend);
-	localStorage.setItem("tc_auto_cast", tc_auto_cast);
-	localStorage.setItem("tc_skipcast", tc_skipcast);
-	localStorage.setItem("tc_auto_focus", tc_auto_focus);
-	localStorage.setItem("tc_auto_heal", tc_auto_heal);
-	localStorage.setItem("tc_auto_misc", tc_auto_misc);
-	localStorage.setItem("tc_use_sublimate", tc_use_sublimate);
-	localStorage.setItem("tc_auto_gather", tc_auto_gather);
-	localStorage.setItem("tc_auto_grind", tc_auto_grind);
-	localStorage.setItem("tc_auto_speed", tc_auto_speed);
-	localStorage.setItem("tc_auto_speed_spells", tc_auto_speed_spells);
-	localStorage.setItem("tc_auto_earn_gold", tc_auto_earn_gold);
-	localStorage.setItem("tc_auto_adv", tc_auto_adv);
-	localStorage.setItem("tc_adventure_wait", tc_adventure_wait);
-	localStorage.setItem("tc_auto_focus_aggressive", tc_auto_focus_aggressive);
-	localStorage.setItem("tc_debug", tc_debug);
+	for (let n of bool_setting_list) {
+		eval(n + "=" + document.getElementById(n).checked);
+		localStorage.setItem(n, eval(n));
+	}
+	for (let n of int_setting_list) {
+		eval(n + "=" + document.getElementById(n).value);
+		localStorage.setItem(n, eval(n));
+	}
+	tc_adventure_wait_cd = tc_adventure_wait;
 
 	// Now need to restart timers with new values
 	tc_start_timers();
@@ -1292,7 +1236,6 @@ function renderPanel(){
 	var config = document.querySelectorAll(".quickbar");if (config.length == 0) return;
 	config = config[0];
 
-	var function_list = ['sinh_function', 'un_stress', 'max_space', 'unlock_tasks_and_upgrades'];
 	var button_list = function_list.map( a => `<button type="button" id="${a}" class="task-btn">${readableText(a)}</button>`);
 	var html = `
 <div id="sinh_controll_panel" class="settings popup task-btn" style="display:none; background-color:#777; max-width:800px; position: absolute; bottom:15px; right: 15px; top: auto; left: auto;">
@@ -1391,20 +1334,14 @@ The advanced feature "try to learn faster in skills tab" will alternate between 
 
 	config.parentNode.insertBefore(configbtn, null);
 
-	// var sinhbtn = document.createElement("button");
-	// var t2 = document.createTextNode("Sinh's function");
-	// sinhbtn.appendChild(t2);
-	// sinhbtn.id = "sinh_function";
-	// sinhbtn.style = "margin-left: auto";	// align right in flexbox
-	// sinhbtn.addEventListener("click", sinh_function);
-	// config.parentNode.insertBefore(sinhbtn, null);
-
-	// var sinhbtn2 = document.createElement("button");
-	// var t3 = document.createTextNode("unstress");
-	// sinhbtn2.appendChild(t3);
-	// sinhbtn2.style = "margin-left: auto";	// align right in flexbox
-	// sinhbtn2.addEventListener("click", un_stress);
-	// config.parentNode.insertBefore(sinhbtn2, null);
+	var sinhbtn = document.createElement("button");
+	var t2 = document.createTextNode("Sinh's function");
+	sinhbtn.appendChild(t2);
+	sinhbtn.id = "sinh_function";
+	sinhbtn.style = "margin-left: auto";	// align right in flexbox
+	sinhbtn.className = "task-btn";
+	sinhbtn.addEventListener("click", sinh_function);
+	config.parentNode.insertBefore(sinhbtn, null);
 
 	// Now need to add the onClick handlers for the cancel/save buttons.
 	// Can't do this directly in the HTML above because the GreaseMonkey functions exist in a different namespace
