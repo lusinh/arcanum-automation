@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         aardvark arcanum auto - Sing's fork
-// @version      2004
+// @version      2005
 // @author       aardvark, Linspatz, Harrygiel, Sing
 // @description  Automates casting buffs, buying gems making types gems, making lore. Adds sell junk/dupe item buttons. Must open the main tab and the spells tab once to work. Add some hack feature ^^
 // @downloadURL  https://github.com/lusinh/arcanum-automation/raw/master/automate.user.js
